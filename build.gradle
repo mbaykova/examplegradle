@@ -1,0 +1,61 @@
+group 'ru.aplana.autotests'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'io.qameta.allure'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+}
+
+configurations {
+    agent
+}
+dependencies {
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.7.1'
+    compile group: 'io.qameta.allure', name: 'allure-cucumber-jvm', version: '2.0-BETA14'
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.21'
+    agent "org.aspectj:aspectjweaver:1.8.10"
+}
+
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "io.qameta.allure:allure-gradle:2.3"
+    }
+}
+
+allure {
+    autoconfigure = true
+    version = '2.4.1'
+
+    aspectjweaver = true
+    autoconfigure = true
+
+    resultsDir = file('/path/to/project/module1/build/allure-results')
+    reportDir = file('build/allure-results')
+
+    useCucumberJVM {
+        version = '2.0-BETA14'
+    }
+
+}
+
+test.doFirst {
+    systemProperties['environment'] = 'application'
+    jvmArgs "-javaagent:${configurations.agent.singleFile}"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
+}
